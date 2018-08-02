@@ -1,5 +1,6 @@
 const gulp = require('gulp');
 const rename = require('gulp-rename');
+const merge = require('merge-stream');
 
 /**
  * Args reserved keys
@@ -21,7 +22,6 @@ const bundleFixTask = () => {
     const args = process.argv;
     var finalArgs = {};
     filterByReserved(args).forEach((val) => {
-        //console.log(curr);
         switch(val){
             case '--vendor':
                 finalArgs['vendor'] = getArg(val);
@@ -42,11 +42,21 @@ const bundleFixTask = () => {
     }
 
     var path = buildStaticJsPath(finalArgs['vendor'], finalArgs['theme'], finalArgs['lang']);
-    gulp.src(path + 'bundle*.js')
-    .pipe(rename( (path) => {
-        path.basename += '.min';
-    }))
-    .pipe(gulp.dest(path));
+    var paths = [
+        path + '/js/bundle/*.js',
+        path + '/requirejs/*.js'
+    ];
+
+    var tasks = paths.map(element => {
+        var destPath = element.replace('*.js', '');
+        return gulp.src(element)
+                .pipe(rename( (path) => {
+                    path.basename += '.min';
+                }))
+                .pipe(gulp.dest(destPath));
+    });
+
+    return merge(tasks);
 }
 
 /**
@@ -58,7 +68,7 @@ const bundleFixTask = () => {
  * @return {String}
  */
 const buildStaticJsPath = (vendor, theme, lang) => {
-    return `pub/static/frontend/${vendor}/${theme}/${lang}/js/`;
+    return `pub/static/frontend/${vendor}/${theme}/${lang}`;
 }
 
 /**
