@@ -1,6 +1,5 @@
 const gulp = require('gulp');
 const rename = require('gulp-rename');
-const merge = require('merge-stream');
 
 /**
  * Args reserved keys

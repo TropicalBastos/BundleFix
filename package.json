@@ -5,8 +5,7 @@
   "main": "gulpfile.js",
   "dependencies": {
     "gulp": "^3.9.1",
-    "gulp-rename": "^1.4.0",
-    "merge-stream": "^1.0.1"
+    "gulp-rename": "^1.4.0"
   },
   "devDependencies": {},
   "scripts": {
