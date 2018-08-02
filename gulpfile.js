@@ -42,21 +42,12 @@ const bundleFixTask = () => {
     }
 
     var path = buildStaticJsPath(finalArgs['vendor'], finalArgs['theme'], finalArgs['lang']);
-    var paths = [
-        path + '/js/bundle/*.js',
-        path + '/requirejs/*.js'
-    ];
-
-    var tasks = paths.map(element => {
-        var destPath = element.replace('*.js', '');
-        return gulp.src(element)
-                .pipe(rename( (path) => {
-                    path.basename += '.min';
-                }))
-                .pipe(gulp.dest(destPath));
-    });
-
-    return merge(tasks);
+    var glob = path + '**/*.js';
+    return gulp.src(glob, { base: './' })
+            .pipe(rename( (path) => {
+                path.basename += '.min';
+            }))
+            .pipe(gulp.dest('./'));
 }
 
 /**
@@ -68,7 +59,7 @@ const bundleFixTask = () => {
  * @return {String}
  */
 const buildStaticJsPath = (vendor, theme, lang) => {
-    return `pub/static/frontend/${vendor}/${theme}/${lang}`;
+    return `pub/static/frontend/${vendor}/${theme}/${lang}/`;
 }
 
 /**
