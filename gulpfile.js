@@ -1,5 +1,6 @@
 const gulp = require('gulp');
 const rename = require('gulp-rename');
+const uglify = require('gulp-uglify');
 
 /**
  * Args reserved keys
@@ -43,6 +44,7 @@ const bundleFixTask = () => {
     var path = buildStaticJsPath(finalArgs['vendor'], finalArgs['theme'], finalArgs['lang']);
     var glob = path + '**/*.js';
     return gulp.src(glob, { base: './' })
+            .pipe(uglify())
             .pipe(rename( (path) => {
                 path.basename += '.min';
             }))
