@@ -19,9 +19,15 @@ const reserved = [
  * @throws {Error} Throws if all three args are not supplied
  */
 const bundleFixTask = () => {
-    var merged = false;
     const args = process.argv;
     var finalArgs = {};
+
+    if(args.filter((item) => item === '--merged').length > 0){
+        merged = true;
+        console.log("Merge flag is on, targeting merge cache...");
+        return processWithMerge();
+    }
+
     filterByReserved(args).forEach((val) => {
         switch(val){
             case '--vendor':
@@ -38,16 +44,11 @@ const bundleFixTask = () => {
         }
     });
 
-    if(args.filter((item) => item === '--merged').length > 0){
-        merged = true;
-        console.log("Merge flag is on, targeting merge cache...");
-    }
-
     if(Object.keys(finalArgs).length != 3){
         throw new Error("Not enough arguments: --vendor --theme --lang");
     }
 
-    return merged ? processWithMerge(finalArgs) : processWithoutMerge(finalArgs); 
+    return processWithoutMerge(finalArgs); 
 }
 
 /**
@@ -73,10 +74,12 @@ const processWithoutMerge = (finalArgs) => {
  * @param {String} finalArgs 
  * @return {Task}
  */
-const processWithMerge = (finalArgs) => {
+const processWithMerge = () => {
     var path = 'pub/static/_cache/merged/*.js';
-    return gulp.src(path, { base: './' })
-            .pipe(uglify())
+    return gulp.src([path, '!**/**.min.js'], { base: './' })
+            .pipe(uglify().on('error', (err) => {
+                console.log(err);
+            }))
             .pipe(gulp.dest('./'));
 }
 
