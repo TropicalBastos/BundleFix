@@ -19,6 +19,7 @@ const reserved = [
  * @throws {Error} Throws if all three args are not supplied
  */
 const bundleFixTask = () => {
+    var merged = false;
     const args = process.argv;
     var finalArgs = {};
     filterByReserved(args).forEach((val) => {
@@ -37,10 +38,25 @@ const bundleFixTask = () => {
         }
     });
 
+    if(args.filter((item) => item === '--merged').length > 0){
+        merged = true;
+        console.log("Merge flag is on, targeting merge cache...");
+    }
+
     if(Object.keys(finalArgs).length != 3){
         throw new Error("Not enough arguments: --vendor --theme --lang");
     }
 
+    return merged ? processWithMerge(finalArgs) : processWithoutMerge(finalArgs); 
+}
+
+/**
+ * @summary Runs a minify in the pub/static and not merge cache
+ * 
+ * @param {String} finalArgs
+ * @return {Task}
+ */
+const processWithoutMerge = (finalArgs) => {
     var path = buildStaticJsPath(finalArgs['vendor'], finalArgs['theme'], finalArgs['lang']);
     var glob = path + '**/*.js';
     return gulp.src(glob, { base: './' })
@@ -48,6 +64,19 @@ const bundleFixTask = () => {
             .pipe(rename( (path) => {
                 path.basename += '.min';
             }))
+            .pipe(gulp.dest('./'));
+}
+
+/**
+ * @summary Runs the task on the merged cache js files
+ * 
+ * @param {String} finalArgs 
+ * @return {Task}
+ */
+const processWithMerge = (finalArgs) => {
+    var path = 'pub/static/_cache/merged/*.js';
+    return gulp.src(path, { base: './' })
+            .pipe(uglify())
             .pipe(gulp.dest('./'));
 }
 
