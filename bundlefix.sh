@@ -9,7 +9,6 @@ php bin/magento config:set dev/template/minify_html 1
 rm -r pub/static
 php bin/magento setup:static-content:deploy
 
-###### MINIFY THE MERGED CACHED JS AND REDEPLOY ###############
+###### MINIFY THE MERGED CACHED JS AND FLUSH CACHE ###############
 gulp bundlefix --merged
 php bin/magento cache:flush
-php bin/magento setup:static-content:deploy
